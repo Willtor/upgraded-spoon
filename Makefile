@@ -18,4 +18,4 @@ paper.pdf: paper.tex $(SRC) $(BIB)
 	$(LATEX) $<
 
 clean:
-	rm -f *.aux *.log *.out *.pdf
+	rm -f *.aux *.log *.out *.pdf *.bbl *.blg
