@@ -13,8 +13,8 @@
 %% Conference information
 %% Supplied to authors by publisher for camera-ready submission;
 %% use defaults for review submission.
-\acmConference[PL'18]{ACM SIGPLAN Conference on Programming Languages}{January 01--03, 2018}{New York, NY, USA}
-\acmYear{2018}
+\acmConference[PPoPP'19]{ACM SIGPLAN Conference on Principles and Practices of Parallel Programming}{February 16--20, 2019}{Washington, D.C., USA}
+\acmYear{2019}
 \acmISBN{} % \acmISBN{978-x-xxxx-xxxx-x/YY/MM}
 \acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
 \startPage{1}
@@ -63,14 +63,14 @@
 \begin{document}
 
 %% Title information
-\title[Short Title]{Full Title}         %% [Short Title] is optional;
+\title[]{DEF plugs memory leaks}        %% [Short Title] is optional;
                                         %% when present, will be used in
                                         %% header instead of Full Title.
-\titlenote{with title note}             %% \titlenote is optional;
+%\titlenote{with title note}             %% \titlenote is optional;
                                         %% can be repeated if necessary;
                                         %% contents suppressed with 'anonymous'
-\subtitle{Subtitle}                     %% \subtitle is optional
-\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+%\subtitle{Subtitle}                     %% \subtitle is optional
+%\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
                                         %% can be repeated if necessary;
                                         %% contents suppressed with 'anonymous'
 
@@ -135,7 +135,7 @@
 %% Note: \begin{abstract}...\end{abstract} environment must come
 %% before \maketitle command
 \begin{abstract}
-Text of abstract \ldots.
+\input{abstract}
 \end{abstract}
 
 
@@ -144,20 +144,14 @@ Text of abstract \ldots.
 \begin{CCSXML}
 <ccs2012>
 <concept>
-<concept_id>10011007.10011006.10011008</concept_id>
-<concept_desc>Software and its engineering~General programming languages</concept_desc>
+<concept_id>10010147.10010169.10010175</concept_id>
+<concept_desc>Computing methodologies~Parallel programming languages</concept_desc>
 <concept_significance>500</concept_significance>
-</concept>
-<concept>
-<concept_id>10003456.10003457.10003521.10003525</concept_id>
-<concept_desc>Social and professional topics~History of programming languages</concept_desc>
-<concept_significance>300</concept_significance>
 </concept>
 </ccs2012>
 \end{CCSXML}
 
-\ccsdesc[500]{Software and its engineering~General programming languages}
-\ccsdesc[300]{Social and professional topics~History of programming languages}
+\ccsdesc[500]{Computing methodologies~Parallel programming languages}
 %% End of generated code
 
 
@@ -175,8 +169,23 @@ Text of abstract \ldots.
 
 \section{Introduction}
 
-Text of paper \ldots
+\input{intro}
 
+\section{Related Work}
+
+\input{related}
+
+\section{Implementation}
+
+\input{implementation}
+
+\section{Experimental Results}
+
+\input{results}
+
+\section{Conclusion}
+
+\input{conclusion}
 
 %% Acknowledgments
 \begin{acks}                            %% acks environment is optional
