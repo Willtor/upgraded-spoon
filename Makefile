@@ -1,7 +1,19 @@
 
 LATEX = pdflatex
+BIBTEX = bibtex
 
-paper.pdf: paper.tex
+SRC =	abstract.tex	\
+	conclusion.tex	\
+	intro.tex	\
+	implementation.tex	\
+	related.tex	\
+	results.tex
+
+BIB = bibliography.bib
+
+paper.pdf: paper.tex $(SRC) $(BIB)
+	$(LATEX) $<
+	$(BIBTEX) paper
 	$(LATEX) $<
 	$(LATEX) $<
 
