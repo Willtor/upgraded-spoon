@@ -6,6 +6,7 @@ SRC =	abstract.tex	\
 	conclusion.tex	\
 	intro.tex	\
 	implementation.tex	\
+	memrec.tex	\
 	related.tex	\
 	results.tex
 
