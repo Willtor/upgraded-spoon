@@ -2,12 +2,13 @@
 LATEX = pdflatex
 BIBTEX = bibtex
 
-SRC =	abstract.tex	\
-	conclusion.tex	\
-	intro.tex	\
+SRC =	abstract.tex		\
+	cintegration.tex	\
+	conclusion.tex		\
+	intro.tex		\
 	implementation.tex	\
-	memrec.tex	\
-	related.tex	\
+	memrec.tex		\
+	related.tex		\
 	results.tex
 
 BIB = bibliography.bib
