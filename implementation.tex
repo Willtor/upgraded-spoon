@@ -1,4 +1,8 @@
-The DEF compiler is based on the Tapir branch of LLVM, that provides fork-join parallelism primitives.\cite{TAPIR}\cite{LLVM}  The front-end is principly written in OCaml.  Likewise, the \texttt{defghi} utility is written in OCaml.\cite{DEF}
+For a thorough examination of the language, DEF has a language wiki,\cite{DEFWiki} however, a brief look is given below.  The DEF compiler is based on the Tapir branch of LLVM, that provides fork-join parallelism primitives.\cite{TAPIR,LLVM}  The front-end is principly written in OCaml, but includes some C++.
+
+Likewise, the \texttt{defghi} utility is written in OCaml,\cite{DEF} and is described in the C Interface section.
+
+Finally, the suite of microbenchmarks was developed in DEF and C with the driver in DEF.  The concurrent data structures selected for the suite were chosen for high performance and variety.
 
 \subsection{Basic Syntax}
 
@@ -18,13 +22,24 @@ Syntactically, DEF looks similar to C with the most apparent difference being th
         \label{fig:typedef}
 \end{figure}
 
-Types are defined with the \texttt{typedef} keyword.  Figure \ref{fig:typedef} shows two examples: a C-style \texttt{string} type is defined on line 1, and a complex number struct is defined on lines 2-5.  The struct's actual definition is identical to tuple syntax, though tuples typically omit the member names.  Worthy of note is that tuples in DEF really are just anonymous structs, in keeping with the design goal of interchangeability with C.  Whereas in many languages tuples are allocated on the heap and garbage collected, in DEF they're allocated however a named struct would be in C.  Locating a struct or tuple on the heap requires explicit allocation.  Fig.~\ref{fig:window-find} provides a \texttt{window\_{}find} function declaration from the (FIXME: proper name and citation)Harris lock-free linked list in the Herlihy-Shavit book, as expressed in C (lines 2-6) and DEF (lines 9-10).  In both cases, the struct is returned by value on the stack.  A pointer, in both cases, would require explicit pointer syntax.
+Types are defined with the \texttt{typedef} keyword.  Figure \ref{fig:typedef} shows two examples: a C-style \texttt{string} type is defined on line 1, and a complex number struct is defined on lines 2-5.  The struct's actual definition is identical to tuple syntax, though tuples typically omit the member names.  Worthy of note is that tuples in DEF really are just anonymous structs, in keeping with the design goal of interchangeability with C.  Whereas in many languages tuples are allocated on the heap and garbage collected, in DEF they're allocated however a named struct would be in C.  Locating a struct or tuple on the heap requires explicit allocation.  Fig.~\ref{fig:window-find} provides a \texttt{window\_{}find} function declaration from the Harris lock-free linked list\cite{Harris} in Herlihy and Shavit,\cite{HSBook} as expressed in C (lines 2-6) and DEF (lines 9-10).  In both cases, the struct is returned by value on the stack.  A pointer, in both cases, would require explicit pointer syntax.
 
 \begin{figure}[htbp!]
         \centering
         \includegraphics[scale=0.25]{gfx/window-find}
         \caption{Equivalent \texttt{window\_{}find} declarations in C and DEF.  The DEF tuple is an unnamed equivalent of C's \texttt{window\_{}t}.}
         \label{fig:window-find}
+\end{figure}
+
+Binary Read-Modify-Write (RMW) operations with sequential consistency can be expressed by applying an \texttt{atomic} modifier to the target operation.  Fig.~\ref{fig:atomic} shows an example of \texttt{atomic} being used to add into the variable \texttt{a}.
+
+%% FIXME: Graphic should show new C atomics, not __sync_* functions.
+
+\begin{figure}[htbp!]
+        \centering
+        \includegraphics[scale=0.25]{gfx/atomic}
+        \caption{Example of modifying a non-RMW operation to make it RMW in DEF.  The C version is GCC-specific.}
+        \label{fig:atomic}
 \end{figure}
 
 \subsection{Allocation, Deallocation, and Reclamation}
