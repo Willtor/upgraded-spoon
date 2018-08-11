@@ -71,3 +71,15 @@ There are two limitations to this: DEF can't import actual C functions (as oppos
 Even with the current limitations, however, DEF is able to import the C standard libraries, use their types, call their functions, and access their global variables.
 
 \subsection{Concurrent Data Structures}
+
+The structures selected are all sets, and the main benchmark driver randomly adds and removes nodes from them at a specified update rate.  It also includes two priority queues with their own driver.
+
+\paragraph{Binary Tree} The fast concurrent lock-free binary search tree by Natarajan and Mittal is a recent concurrent data structure that operates by marking edges rather than nodes.\cite{LFBinaryTree}  (talk about retiring)
+
+\paragraph{Skip List} A fixed-height lock-free skip list was included as a well-known probabilistic concurrent data structure.  Each node contains one value, and the nodes are arranged in a list with a set of one or more forward pointers.  Each forward pointer points to the next node with at least that height, and the height averages two.  Operations take logarithmic time, as they would in a binary tree, but tend to have better cache usage.  A node is retired by the thread that swings the lowest height pointer during removal; a one-line change to the algorithm as described in Herlihy-Shavit.\cite{HSBook}
+
+\paragraph{Hash Table} The lock-free separate chaining hash table performed favorably in Michael's tests.\cite{HashTables} (brief description)
+
+\paragraph{Shavit Lotan Queue} This was included as an example of a skip list-based priority queue.\cite{ShavitLotanQueue}  (brief description)
+
+\paragraph{SprayList} Finally, the SprayList priority queue was implemented.\cite{SprayList}  Like the other, this is based on a skip list, but the node to remove is selected probabilistically from near the beginning to reduce contention.  As in the skip list, the node is retired by the thread that swings its lowest height pointer.
