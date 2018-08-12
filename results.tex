@@ -2,15 +2,23 @@
 
 DEF is designed to be transparently compatible with C in that C header files can be included in DEF, and the utility \texttt{defghi} (DEF Generate Headers and Interfaces), can take DEF source files and emit C header files for inclusion in C.  This makes it easy to correct for any variation created by the benchmark driver or the allocator.
 
+Our benchmark was tested on a 72-core (4 sockets, 144 hardware threads) Intel Xeon machine at 2.50 GHz with 512 GB of RAM and 4 memory banks. Each CPU has 18 cores capable of running 2 hardware threads. The machine is running Ubuntu 14.04 with kernel verion 3.13.0-141. The code was compiled with DEF code and implementation was compiled with DEF version (Whatever) and the C code was compiled with Clang 6.0. All code was compiled with -03 level of optimisation. % I hate the thread pinning sentence. I always find it hard to phrase.
+Threads were pinned programmatically to inidvidual cores initially avoiding HyperThreading and afterward exhausting all inidivual exection units on a single CPU via HyperThreading, before migrating to another CPU socket. The scalable JEMalloc (cite JEMalloc and find version) allocator was used in all tests  The \texttt{numactl} Linux program was used to control which memory bank allocation was allowed to take place. The memory banks closest to the running CPUs were selected as they became active.
+
+The microbenchmark measures the number of operations carried out over a specified amount of time rather than the time taken to exectute a specified number of iterations. The rational for this is threads finish their iterations before other threads. The remaining threads complete their iterations with less contention in the system, skewing the overall benchmark. The primary comparison is between the leaky C and the forkscan enabled DEF implementations. 
+
+Initially we present a relative performance graph to demonstrate the speed (Relative performance of C to DEF) of C to DEF. The bar chart shows the relative performance as a percentage of C to DEF. The chart shows that DEF achieves very comparable performance to C in the single threaded leaky benchmark. The other charts represent a more typical line comparison of operations per second in the aggregate of all threads.
 
 
 \begin{figure}
 \includegraphics[scale=0.4]{gfx/relativeperf.pdf}
 \caption{Relative performance of C to DEF}
+\label{fig:relativeperf}
 \end{figure}
 \begin{figure}
 \includegraphics[scale=.4]{gfx/BinaryTreeLight.pdf}
 \caption{Lock-Free Binary Tree}
+\label{fig:bintreelight}
 \end{figure}
 
 \begin{figure}
