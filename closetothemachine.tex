@@ -1,0 +1,11 @@
+C was designed to write the Unix operating system in a time of irregular architectures.  Its durability and staying power is a testament to its level of abstraction from any specific hardware, yet its ability to program closely to all.
+
+Go is a modern programming language intended to be fast where C is fast in spite of a garbage collector.\cite{Go}  It has the look and feel of a higher level language without the cost of an interpreter.  It has lambdas, message passing, array slices, and a host of other features not commonly associated with systems languages.  However, even though it's able to eliminate array bounds checking in most cases, it still checks unless it can prove it doesn't have to.  Additionally, Go types always respect alignment, even within structures, so a programmer can reorder the members but there is no way to pack it down to the byte level.
+
+Rust, likewise, doesn't provide controls for laying out data.  Padding and alignment are unspecified and Rust even reserves the right to reorder members.  Both languages can generate fast code, but they aren't close to the machine because they forbid fine tuning.
+
+C++, building on C, is designed neither to introduce safety-related overheads, nor to prohibit programmer fine-tuning to architectural peculiarities.  It doesn't, for example, insert instructions to protect programmers from invalid array indexes.  In fact, memory allocators implemented in C++ depend on this ability.\cite{Hoard}\cite{TCMalloc}\cite{Supermalloc}
+
+Control over memory layout is crucial to concurrent data structures since fetching cache lines, especially unpredictably, can saturate memory bandwidth quickly.  And \textit{false sharing}, where two threads access different memory addresses sharing a single cache line (and at least one of them writes), leads to slow down by inadvertant cache invalidation.
+
+Control over code generation, both the knowledge that no unexpected ``safety'' instructions will be generated, and the ability to generate specific instructions is the other dimension of a close to the machine language. (brief talk about C/C++ atomics)

@@ -1,9 +1,13 @@
-The three core components of this work are the language design around memory reclamation, integration with C code bases, and the selection of concurrent data structures implemented in the benchmark.  Other design elements of the language are beyond the scope of this paper, and language features are introduced, briefly, as required in the Implementation section.
+The three design goals stated in the introduction are each addressed by various existing languages and programming techniques, and the domain of interest is at the intersection of the three.  In this section, each criterion is examined independently.
 
-\subsection{Memory Reclamation}
+\subsection{Close to the Machine}
+
+\input{closetothemachine}
+
+\subsection{Modularity}
 
 \input{memrec}
 
-\subsection{C Integration}
+\subsection{Compatibility}
 
 \input{cintegration}

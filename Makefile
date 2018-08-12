@@ -4,6 +4,7 @@ BIBTEX = bibtex
 
 SRC =	abstract.tex		\
 	cintegration.tex	\
+	closetothemachine.tex	\
 	conclusion.tex		\
 	intro.tex		\
 	implementation.tex	\
