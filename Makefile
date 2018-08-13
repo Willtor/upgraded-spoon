@@ -3,6 +3,7 @@ LATEX = pdflatex
 BIBTEX = bibtex
 
 SRC =	abstract.tex		\
+	cds-implementation.tex	\
 	cintegration.tex	\
 	closetothemachine.tex	\
 	conclusion.tex		\
