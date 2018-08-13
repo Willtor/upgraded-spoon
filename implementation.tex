@@ -42,6 +42,15 @@ Binary Read-Modify-Write (RMW) operations with sequential consistency can be exp
         \label{fig:atomic}
 \end{figure}
 
+Data layout is also programmer-defined.  Structs and tuple members are arranged in the order specified and aligned according to the native alignment of the underlying types.  Fig.~\ref{fig:packed} shows an example of a packed data structure in C (lines 1-2) and DEF (line 4).  Packed structs and tuples have the minimum addressable alignment, as do their members, and are packed as tightly as the architecture permits.  In C, this is accomplished through compiler-specific attributes, but it's widely supported.
+
+\begin{figure}[htbp!]
+        \centering
+        \includegraphics[scale=0.25]{gfx/packed}
+        \caption{\texttt{packed} in front of a tuple specifies alignment of the members.}
+        \label{fig:packed}
+\end{figure}
+
 Despite the difference in syntax, DEF exhibits the same kind of expressibility as C in data layout and instruction generation.  There aren't unexpected hidden costs in operations or types, allowing a programmer to tune DEF code for performance in the same way as one would do for C.
 
 \subsection{Modularity}
