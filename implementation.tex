@@ -1,10 +1,10 @@
-For a thorough examination of the language, DEF has a language wiki,\cite{DEFWiki} however, a brief look is given below.  The DEF compiler is based on the Tapir branch of LLVM, that provides fork-join parallelism primitives.\cite{TAPIR,LLVM}  The front-end is principly written in OCaml, but includes some C++.
+For a thorough examination of the language, DEF has a language wiki,\cite{DEFWiki} however, a brief comparison with C is provided to show that it is, in fact, close to the machine in the same way that C is, albeit with a different syntax.  The DEF compiler is based on the Tapir branch of LLVM, that adds fork-join parallelism primitives.\cite{TAPIR,LLVM}  The front-end is principly written in OCaml, but includes some C++.
 
-Likewise, the \texttt{defghi} utility is written in OCaml,\cite{DEF} and is described in the C Interface section.
+Likewise, the \texttt{defghi} utility is written in OCaml,\cite{DEF} and is described in the Compatibility section.
 
-Finally, the suite of microbenchmarks was developed in DEF and C with the driver in DEF.  The concurrent data structures selected for the suite were chosen for high performance and variety.
+Finally, the suite of microbenchmarks was developed in DEF and C with the driver in DEF.  The concurrent set data structures selected for the suite were chosen for high performance and variety.
 
-\subsection{Basic Syntax}
+\subsection{Close to the Machine}
 
 \begin{figure}[htbp!]
         \centering
@@ -13,7 +13,9 @@ Finally, the suite of microbenchmarks was developed in DEF and C with the driver
         \label{fig:types}
 \end{figure}
 
-Syntactically, DEF looks similar to C with the most apparent difference being that scopes are denoted by keywords instead of curly braces (e.g., \texttt{if} and \texttt{fi}, \texttt{do} and \texttt{od}, etc.) allowing curly braces to be repurposed for tuples.  Native types specify a bit width, so C's \texttt{int} on most systems corresponds to DEF's \texttt{i32}.  Types are also designed to read left-to-right, so the return type in a function declaration has been moved to the right using an arrow notation similar to ML-like languages or Go.  For more complicated types, fig.~\ref{fig:types} gives an example of left-to-rightness where no parentheses are needed to distinguish an array of pointers to integers (line 1) from a pointer to an array of 32-bit integers (line 2).
+Syntactically, DEF has some similarity to C with the most apparent difference being that scopes are denoted by keywords instead of curly braces (e.g., \texttt{if}/\texttt{then} and \texttt{fi}, \texttt{do} and \texttt{od}, etc.) allowing curly braces to be repurposed for tuples.  Native types specify a bit width, so C's \texttt{int} on most systems corresponds to DEF's \texttt{i32}.  Types are also designed to read left-to-right, so the return type in a function declaration has been moved to the right using an arrow notation similar to ML-like languages or Go.  For more complicated types, fig.~\ref{fig:types} gives an example of left-to-rightness where no parentheses are needed to distinguish an array of pointers to integers (line 1) from a pointer to an array of integers (line 2).
+
+The expressibility is equivalent to C.  Arrays, for example, contain no metadata and can appear on the stack or on the heap.  DEF is able to commit to native integers and floating point variables of specific width, however, because architectures have largely settled on them.  C acknowledges this as of the C99 standard with types like \texttt{int32\_t} defined in the \texttt{stdint.h} header file.(cite C99)
 
 \begin{figure}[htbp!]
         \centering
@@ -22,7 +24,7 @@ Syntactically, DEF looks similar to C with the most apparent difference being th
         \label{fig:typedef}
 \end{figure}
 
-Types are defined with the \texttt{typedef} keyword.  Figure \ref{fig:typedef} shows two examples: a C-style \texttt{string} type is defined on line 1, and a complex number struct is defined on lines 2-5.  The struct's actual definition is identical to tuple syntax, though tuples typically omit the member names.  Worthy of note is that tuples in DEF really are just anonymous structs, in keeping with the design goal of interchangeability with C.  Whereas in many languages tuples are allocated on the heap and garbage collected, in DEF they're allocated however a named struct would be in C.  Locating a struct or tuple on the heap requires explicit allocation.  Fig.~\ref{fig:window-find} provides a \texttt{window\_{}find} function declaration from the Harris lock-free linked list\cite{Harris} in Herlihy and Shavit,\cite{HSBook} as expressed in C (lines 2-6) and DEF (lines 9-10).  In both cases, the struct is returned by value on the stack.  A pointer, in both cases, would require explicit pointer syntax.
+Types are defined with the \texttt{typedef} keyword.  Figure \ref{fig:typedef} shows two examples: a C-style \texttt{string} type is defined on line 1, and a complex number struct is defined on lines 2-5.  The struct's actual definition is identical to tuple syntax, though tuples typically omit the member names.  Worthy of note is that tuples in DEF really are just anonymous structs, in keeping with the design goal of interchangeability with C.  Whereas in many languages tuples are allocated on the heap and garbage collected, in DEF they're allocated however a named struct would be in C.  Locating a struct or tuple on the heap requires explicit allocation.  Fig.~\ref{fig:window-find} provides a \texttt{window\_{}find} function declaration from the Harris lock-free linked list\cite{Harris} in Herlihy and Shavit,\cite{HSBook} as expressed in C (lines 2-6) and DEF (lines 9-10).  In both cases, the struct is returned by value on the stack.  A pointer, in both languages, would require explicit pointer syntax.
 
 \begin{figure}[htbp!]
         \centering
@@ -33,30 +35,41 @@ Types are defined with the \texttt{typedef} keyword.  Figure \ref{fig:typedef} s
 
 Binary Read-Modify-Write (RMW) operations with sequential consistency can be expressed by applying an \texttt{atomic} modifier to the target operation.  Fig.~\ref{fig:atomic} shows an example of \texttt{atomic} being used to add into the variable \texttt{a}.
 
-%% FIXME: Graphic should show new C atomics, not __sync_* functions.
-
 \begin{figure}[htbp!]
         \centering
         \includegraphics[scale=0.25]{gfx/atomic}
-        \caption{Example of modifying a non-RMW operation to make it RMW in DEF.  The C version is GCC-specific.}
+        \caption{Example of modifying a non-RMW operation to make it RMW in DEF.  The C atomic is available since C11.}
         \label{fig:atomic}
 \end{figure}
 
-\subsection{Allocation, Deallocation, and Reclamation}
+Data layout is also programmer-defined.  Structs and tuple members are arranged in the order specified and aligned according to the native alignment of the underlying types.  Fig.~\ref{fig:packed} shows an example of a packed data structure in C (lines 1-2) and DEF (line 4).  Packed structs and tuples have the minimum addressable alignment, as do their members, and are packed as tightly as the architecture permits.  In C, this is accomplished through compiler-specific attributes, but it's widely supported.
 
-DEF has no native allocator as distinct from C.  Allocating memory with \texttt{new} and deallocating it with \texttt{delete}, use \texttt{malloc} and \texttt{free}, respectively.  Since DEF's memory reclamation system is implemented using Forkscan, they implicitly use Forkscan's \texttt{malloc} and \texttt{free} wrappers, but the overhead of this indirection is undetectable in trials.  Independent of implementation, memory allocated with \texttt{new} is untracked.  Memory can be passed freely between DEF and C, and a pointer acquired in C through \texttt{malloc} can be deleted in DEF, and one acquired in DEF through \texttt{new} can be freed in C.
+\begin{figure}[htbp!]
+        \centering
+        \includegraphics[scale=0.25]{gfx/packed}
+        \caption{\texttt{packed} in front of a tuple specifies alignment of the members.}
+        \label{fig:packed}
+\end{figure}
+
+Despite the difference in syntax, DEF exhibits the same kind of expressibility as C in data layout and instruction generation.  There aren't unexpected hidden costs in operations or types, allowing a programmer to tune DEF code for performance in the same way as one would do for C.
+
+\subsection{Modularity}
+
+As above, modularity is decided by the profile presented to users of a library.  In a concurrent data structure, what does a programmer need to know about pointers returned from thus-and-such a function call?  What are the restrictions?
+
+DEF has no native allocator.  Allocating memory with \texttt{new} and deallocating it with \texttt{delete}, use \texttt{malloc} and \texttt{free}, respectively.  Since DEF's memory reclamation system is implemented using Forkscan, they implicitly use Forkscan's \texttt{malloc} and \texttt{free} wrappers, but the overhead of this indirection is undetectable in trials.  Independent of implementation, memory allocated with \texttt{new} is untracked.  Memory can be passed freely between DEF and C, and a pointer acquired in C through \texttt{malloc} can be deleted in DEF, and one acquired in DEF through \texttt{new} can be freed in C.
 
 Moreover, \texttt{new} and \texttt{delete}, as applied to non-shared memory, are conveniences-only.  Mixing allocators or interfacing with a language with hooks to an external garbage collector is as trivial (or as complex) in DEF as it is in C because all memory is treated in exactly the same way.
 
-The exception to this is in the use of \texttt{retire} to flag a pointer for tracking.  It's assumed that a retired node was allocated with the same allocator used by \texttt{new}.  Implementation-wise, Forkscan requires knowledge of the \texttt{free} and \texttt{malloc\_{}usable\_{}size} corresponding to the \texttt{malloc} that was used to acquire the memory.  More broadly, it's hard to see how any implementation could call the correct \texttt{free} on a retired node unless it corresponded to the known \texttt{malloc}, and this isn't especially burdensome to programmers.
+The exception to this is in the use of \texttt{retire} to flag a pointer for tracking.  \texttt{retire} cannot be applied arbitrarily to pointers since there is no way to determine origin.  DEF assumes that a retired node was allocated with the same allocator used by \texttt{new}.  Implementation-wise, Forkscan requires knowledge of the \texttt{free} and \texttt{malloc\_{}usable\_{}size} corresponding to the \texttt{malloc} that was used to acquire the memory.  More broadly, it's hard to see how any implementation could call the correct \texttt{free} on a retired node unless it corresponded to the known \texttt{malloc} for the same reason.  This is not especially burdensome to programmers since mixing allocators is typically frowned upon.
 
 A final restriction on \texttt{retire} is that it may only be called on a pointer, once.  If multiple threads retire the same memory, the behavior is undefined.  In practice, it acts like a double-free because the reclamation system may perform a double-free.  A good usage model is the thread that successfully removes a node from the concurrent data structure is the one that should retire it.  This makes its use intuitive because code looks like the familiar serial model where \texttt{retire} is replaced by \texttt{delete}.
 
-Forkscan was modified to accommodate these semantics.  When Forkscan completes a memory sweep, it creates a pool of pointers known to have no outstanding references in the user program.  As designed, every call to \texttt{forkscan\_{}malloc} first frees a few of these pointers.  But this creates a dependency on \texttt{forkscan\_{}malloc}.  If a C module naively, repeatedly calls \texttt{malloc}, even from the correct allocator, and gives the memory to a DEF module that retires it, unless the DEF module is also independently allocating its own memory with \texttt{new}, none of the retired memory will ever be reused.  This is a practical leak.  The modification moved the burden from \texttt{forkscan\_{}malloc} to \texttt{forkscan\_retire}, eliminating the dependency.
+Forkscan was modified to accommodate these semantics.  When Forkscan completes a memory sweep, it creates a pool of pointers known to have no outstanding references in the user program.  As designed, every call to \texttt{forkscan\_{}malloc} first frees a few of these pointers.  But this creates a dependency on \texttt{forkscan\_{}malloc}.  If a C module naively, repeatedly calls \texttt{malloc} (as opposed to \texttt{forkscan\_{}malloc}), even from the correct allocator, and gives the memory to a DEF module that retires it, unless the DEF module is also independently allocating its own memory with \texttt{new}, none of the retired memory will ever be reused.  This is a practical leak.  The modification moved the burden from \texttt{forkscan\_{}malloc} to \texttt{forkscan\_retire}, eliminating the dependency.
 
-This produced no discernable difference in performance.  The reasoning for the original design was that freeing memory and then immediately allocating would likely return a pointer to memory that was already in the cache.  High performance allocators tend to have this property.  Changing the location of the burden didn't affect performance because, even if \texttt{malloc} wasn't called immediately after \texttt{free}, the delay between retiring and allocating memory wasn't very great, and the allocated memory was probably still in the cache.  Since some of the concurrent data structures tested were among the most high-performance known, we reason that the change has little or no effect on performance.
+This produced no discernable difference in performance.  The reasoning for the original design was that freeing memory and then immediately allocating would likely return a pointer to memory that was already in the cache.  High performance allocators tend to have this property.  Changing the location of the burden didn't affect performance because, even if \texttt{malloc} wasn't called immediately after \texttt{free}, the delay between retiring and allocating memory wasn't very great, and the allocated memory was probably still in the cache.  Since some of the concurrent data structures tested were among the most high-performance known, we reason that the change has little or no effect on performance.  Even in a producer/consumer application, where \texttt{malloc} is being called with high frequency such that whether memory in cache has a measurable impact on performance, the likelihood is that the producer is getting memory from the cache in a high performance allocator, anyway.
 
-\subsection{C Interface}
+\subsection{Compatibility}
 
 C++ is the gold-standard for interfacing with C.  As mentioned above, C header files can be included directly into C++ files, and C++ functions can be declared with C linkage.  Features like templates, classes, and member functions of structs, can't be exported to C, but anything C-like can be.  Given DEF's syntactic differences, even for features it holds in common with C, sharing DEF interface (\texttt{.defi}) files directly with C is impractical.  However, most of the function-level features have a one-to-one correspondence with C.  Therefore, the compiler is accompanied by a utility, \texttt{defghi}, for generating headers and interface files from DEF source files.
 
