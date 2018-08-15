@@ -4,8 +4,10 @@ Go is a modern programming language intended to be fast where C is fast in spite
 
 Rust, likewise, doesn't provide controls for laying out data.  Padding and alignment are unspecified and Rust even reserves the right to reorder members.  Both languages can generate fast code, but they aren't close to the machine because they forbid fine tuning.
 
-C++, building on C, is designed neither to introduce safety-related overheads, nor to prohibit programmer fine-tuning to architectural peculiarities.  It doesn't, for example, insert instructions to protect programmers from invalid array indexes.  In fact, memory allocators implemented in C++ depend on this ability.\cite{Hoard}\cite{TCMalloc}\cite{Supermalloc}
+C++, building on C, is designed neither to introduce safety-related overheads, nor to prohibit programmer fine-tuning to architectural peculiarities.  It doesn't, for example, insert instructions to protect programmers from invalid array indexes.  In fact, memory allocators implemented in C++ depend on the ability to do exactly that, often storing memory metadata in a structure before the memory handed out.\cite{Hoard, TCMalloc, Supermalloc}
 
 Control over memory layout is crucial to concurrent data structures since fetching cache lines, especially unpredictably, can saturate memory bandwidth quickly.  And \textit{false sharing}, where two threads access different memory addresses sharing a single cache line (and at least one of them writes), leads to slow down by inadvertant cache invalidation.
 
-Control over code generation, both the knowledge that no unexpected ``safety'' instructions will be generated, and the ability to generate specific instructions is the other dimension of a close to the machine language. (brief talk about C/C++ atomics)
+Control over code generation, both the knowledge that no unexpected ``safety'' instructions will be generated, and the ability to generate specific instructions is the other dimension of a close to the machine language, as C and C++ do in their respective ways with \textit{read-modify-write} atomics.  The C11(?) standard, for example, added intrinsic functions for RMW operations.
+
+DEF necessarily includes control over memory layout, and disincludes runtime safety checks that might slow down operations.  It also provides an \texttt{atomic} annotation for operations that should be RMW, and intrinsics for more specific semantics and non-binary instructions.
