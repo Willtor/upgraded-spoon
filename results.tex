@@ -2,7 +2,7 @@
 
 Our benchmark was tested on a 72-core (4 sockets with 18 cores each capable of running 2 hardware threads, totaling 144 hardware threads) Intel Xeon machine clocked at 2.50 GHz with 512 GB of RAM and 4 memory banks. The machine is running Ubuntu 14.04 with kernel verion 3.13.0-141. The with DEF code was compiled with DEF version 0.16.1a and the C code was compiled with Clang 6.0, and all code was compiled with -03 level of optimisation.
 
-During the benchmark threads were pinned programmatically to inidvidual cores initially avoiding HyperThreading and later exhausting all inidivual exection units on a single CPU with the use of HyperThreading, before migrating to another CPU socket. The scalable JEMalloc\cite{JEMalloc} allocator was used in all tests, as it had been in the Forkscan paper.\cite{Forkscan} The \texttt{numactl} Linux program was used to control which memory bank allocation was allowed to take place. The memory banks closest to the running CPUs were selected as they became active.
+During the benchmark threads were pinned programmatically to inidvidual cores initially avoiding HyperThreading and later exhausting all inidivual exection units on a single CPU with the use of HyperThreading, before migrating to another CPU socket. JEMalloc\cite{JEMalloc} was used in all tests, as it had been in the Forkscan paper.\cite{Forkscan} The \texttt{numactl} Linux program was used to control which memory bank allocation was allowed to take place. The memory banks closest to the running CPUs were selected as they became active.
 
 The microbenchmark measures the number of operations carried out over a specified amount of time rather than the time taken to exectute a specified number of iterations. The rationale for this is threads finish their iterations before other threads. The remaining threads complete their iterations with less contention in the system, skewing the overall benchmark. Our benchmark reports the number of operations per second. The primary comparison is between the leaky C and the forkscan enabled DEF implementations. Each benchmark is run for a total of 20 seconds each, with each configuration being sampled 5 times. The average of the runs is plotted with error bars show the maximum variation in each run.
 
@@ -31,16 +31,21 @@ Minor degradation in performance is observed when memory is retired. (results?)
   \label{fig:setdatastructures}
 \end{figure*}
 
-Scalability results for the set data structures with 10\% and 20\% updates are presented in figure \ref{fig:setdatastructures}.  As above, the three configurations were tested: Leaky-DEF, DEF, and C (also leaky).  (size of data structures in MB or GB)
+Scalability results for the set data structures with 10\% and 20\% updates are presented in figure \ref{fig:setdatastructures}.  20\% updates, on a set data structure, represents an extremely heavy workload.  10\% represents something more typical.  As above, the three configurations were tested: Leaky-DEF, DEF, and C (also leaky).  (size of data structures in MB or GB)
 
-C and Leaky-DEF both scale roughly linearly at 10\% updates for all three structures.  A slight hesitation is observed as they cross the NUMA boundary at 36 cores, and some affinity is visible crossing 72 threads (saturating the cores).  The non-leaky DEF versions are more gradual.  The hash table and the skip list perform with visible overhead, but consistently scale except as approaching the hyperthread limit.  This is accounted for by the fact that Forkscan creates a pool of child processes to perform the scan, up to 16, but since the application threads are pinned, the Forkscan threads get shifted around.
+% Hashtable: node = 24
+% Tree: node = 24
+% Skip List: node = 172 (height 20)
+% Shavit/Lotan: node = 180 (height 20)
+% SprayList: node = 180 (height 20)
 
-The binary tree tests the limits of the memory reclamation implementation, as it scales more gently and levels out around at around 90 threads.  The binary tree, similar in performance to this hash table, involves more writing per update. (is this true, Rob?)
+C and Leaky-DEF both scale similarly for all three structures.  The hash table scales linearly, performing only a few operations per microsecond worse on 144 threads at 20\% than at 10\%.  In the retiring version of the code, Forkscan is able to keep pace until the application saturates the first socket at 36 threads.  The decline at the high end is due to the fact that Forkscan creates a pool of child processes to perform its scan, up to 16, but since the application threads are pinned, the Forkscan threads get shifted around.
 
-20\% updates corresponds to an extremely write-heavy workload for real-world set data structures.  The leaky hash tables scale, but they're the most sensitive of the three structures to memory layout.  Since Leaky-DEF was slightly outperforming C, it reached the memory bandwidth limitations before C did. (verify?)  The retiring DEF code was jittery at higher thread counts for the same reason, as it ran its root-finding algorithm.
+The skip list saturates the memory bandwidth with its enormous fixed-height nodes.  The peaks are merely shifted left in the 20\% executions versus 10\%, and don't rise as high (35 vs. 60 ops/$\mu$s).  Leaky DEF scales more quickly and, consequently, falls off sooner than the C version.  This is related to the aforementioned difference in code generation.  Nodes average two pointers instead of one, as in the hash table, making root finding slower when memory is reclaimed.  But its decline has the same cause as the leaky implementations: it hits the memory bandwidth at the same time.
 
-The skip list, at that rate, saturated the memory bandwidth of the machine earlier because it's more traversal-heavy than the hash table.  The larger process also made scanning take long enough that Forkscan throttled.
+The binary tree tests the limits of the memory reclamation implementation, which scales with the leaky versions, but has a more gradual slope.  At 10\% it declines at the end, just as the hash table did, and for the same reason.  The binary tree, exceeding the performance of this hash table, involves more writing per update (is this true, Rob?).  At 20\% updates, the leaky versions reach the memory bandwidth limits before they've run out of physical threads.
 
+In all three set structures, reclaiming memory scales up to the physical limits of the hardware, albeit with a gentler slope.
 
 \begin{figure*}[tbp]
   \centering
