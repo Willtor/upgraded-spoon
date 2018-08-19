@@ -15,7 +15,7 @@ The microbenchmark measures the number of operations carried out over a specifie
   \label{fig:relativeperf}
 \end{figure}
 
-Figure \ref{fig:relativeperf} shows, for all benchmarks, single-threaded performance.  The set data structures are configured with 10\% updates, and the priority queues, naturally, are 100\% updates.  For an apples-to-apples comparison with C, a non-retiring version of the DEF code is presented.  This is a meaningful test because one expects a serial C data structure to perform better when \texttt{free} is never called than when it is, and it's no different for a concurrent data structure.  As designed, DEF is close to the machine and performs comparably in this case.  We attribute any performance distinctions to slight differences in code generation.
+Figure \ref{fig:relativeperf} shows, for all benchmarks, single-threaded performance.  The set data structures are configured with 10\% updates, and the priority queue, naturally, are 100\% updates.  For an apples-to-apples comparison with C, a non-retiring version of the DEF code is presented.  This is a meaningful test because one expects a serial C data structure to perform better when \texttt{free} is never called than when it is, and it's no different for a concurrent data structure.  As designed, DEF is close to the machine and performs comparably in this case.  We attribute any performance distinctions to slight differences in code generation.
 
 Minor degradation in performance is observed when memory is retired. (results?)
 
@@ -43,17 +43,16 @@ C and Leaky-DEF both scale similarly for all three structures.  The hash table s
 
 The skip list saturates the memory bandwidth with its enormous fixed-height nodes.  The peaks are merely shifted left in the 20\% executions versus 10\%, and don't rise as high (35 vs. 60 ops/$\mu$s).  Leaky DEF scales more quickly and, consequently, falls off sooner than the C version.  This is related to the aforementioned difference in code generation.  Nodes average two pointers instead of one, as in the hash table, making root finding slower when memory is reclaimed.  But its decline has the same cause as the leaky implementations: it hits the memory bandwidth at the same time.
 
-The binary tree tests the limits of the memory reclamation implementation, which scales with the leaky versions, but has a more gradual slope.  At 10\% it declines at the end, just as the hash table did, and for the same reason.  The binary tree, exceeding the performance of this hash table, involves more writing per update (is this true, Rob?).  At 20\% updates, the leaky versions reach the memory bandwidth limits before they've run out of physical threads.
+The binary tree tests the limits of the memory reclamation implementation, which scales with the leaky versions, but has a more gradual slope.  At 10\% it declines at the end, just as the hash table did, and for the same reason.  The binary tree, exceeding the performance of this hash table, involves more writing per update.  At 20\% updates, the leaky versions reach the memory bandwidth limits before they've run out of physical threads.
 
 In all three set structures, reclaiming memory scales up to the physical limits of the hardware, albeit with a gentler slope.
 
 \begin{figure*}[tbp]
   \centering
-  \raisebox{-0.5\height}{\includegraphics[scale=0.25]{gfx/ShavitLotanQueue.pdf}}
   \raisebox{-0.5\height}{\includegraphics[scale=0.25]{gfx/SprayList.pdf}}
-  \caption{Scalability graphs for the priority queues.  A priority queue's standard workload is 100\% updates.}
+  \caption{Scalability graphs for the priority queue.  The priority queue standard workload is 100\% updates.}
   \label{fig:priorityqueues}
 \end{figure*}
 
-Lastly, in figure \ref{fig:priorityqueues}, we tested the two priority queues.
+Lastly, in figure \ref{fig:priorityqueues}, we tested the one priority queue.
 
