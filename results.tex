@@ -1,6 +1,6 @@
 \subsection{Test Configuration}
 
-Our benchmark was tested on a 72-core (4 sockets with 18 cores each capable of running 2 hardware threads, totaling 144 hardware threads) Intel Xeon machine clocked at 2.50 GHz with 512 GB of RAM and 4 memory banks. The machine is running Ubuntu 14.04 with kernel verion 3.13.0-141. The with DEF code was compiled with DEF version 0.16.1a and the C code was compiled with Clang 6.0, and all code was compiled with -03 level of optimisation.
+Our benchmark was tested on a 72-core (4 sockets with 18 cores each capable of running 2 hardware threads, totalling 144 hardware threads) Intel Xeon machine clocked at 2.50 GHz with 512 GB of RAM and 4 memory banks. The machine is running Ubuntu 14.04 with kernel verion 3.13.0-141. The with DEF code was compiled with DEF version 0.16.1a and the C code was compiled with Clang 6.0, and all code was compiled with -03 level of optimisation.
 
 During the benchmark threads were pinned programmatically to inidvidual cores initially avoiding HyperThreading and later exhausting all inidivual exection units on a single CPU with the use of HyperThreading, before migrating to another CPU socket. JEMalloc\cite{JEMalloc} was used in all tests, as it had been in the Forkscan paper.\cite{Forkscan} The \texttt{numactl} Linux program was used to control which memory bank allocation was allowed to take place. The memory banks closest to the running CPUs were selected as they became active.
 
@@ -43,7 +43,7 @@ C and Leaky-DEF both scale similarly for all three structures.  The hash table s
 
 The skip list saturates the memory bandwidth with its enormous fixed-height nodes.  The peaks are merely shifted left in the 20\% executions versus 10\%, and don't rise as high (35 vs. 60 ops/$\mu$s).  Leaky DEF scales more quickly and, consequently, falls off sooner than the C version.  This is related to the aforementioned difference in code generation.  Nodes average two pointers instead of one, as in the hash table, making root finding slower when memory is reclaimed.  But its decline has the same cause as the leaky implementations: it hits the memory bandwidth at the same time.
 
-The binary tree tests the limits of the memory reclamation implementation, which scales with the leaky versions, but has a more gradual slope.  At 10\% it declines at the end, just as the hash table did, and for the same reason.  The binary tree, exceeding the performance of this hash table, involves more writing per update.  At 20\% updates, the leaky versions reach the memory bandwidth limits before they've run out of physical threads.
+The binary tree tests the limits of the memory reclamation implementation, which scales with the leaky versions, but has a more gradual slope.  At 10\% it declines at the end, just as the hash table did, and for the same reason.  The binary tree, exceeding the performance of this hash table (due to the list length of 36), involves more writing per update.  At 20\% updates, the leaky versions reach the memory bandwidth limits before they've run out of physical threads.
 
 \begin{figure*}[tbp]
   \centering
