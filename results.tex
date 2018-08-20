@@ -31,7 +31,7 @@ Minor degradation in performance is observed when memory is retired. (results?)
   \label{fig:setdatastructures}
 \end{figure*}
 
-Scalability results for the set data structures with 10\% and 20\% updates are presented in figure \ref{fig:setdatastructures}.  20\% updates, on a set data structure, represents an extremely heavy workload.  10\% represents something more typical.  As above, the three configurations were tested: Leaky-DEF, DEF, and C (also leaky).  (size of data structures in MB or GB)
+Scalability results for the set data structures with 10\% and 20\% updates are presented in figure \ref{fig:setdatastructures}.  20\% updates, on a set data structure, represents an extremely heavy workload.  10\% represents something more typical.  As above, the three configurations were tested: Leaky-DEF, DEF, and C (also leaky).
 
 % Hashtable: node = 24
 % Tree: node = 24
@@ -45,8 +45,6 @@ The skip list saturates the memory bandwidth with its enormous fixed-height node
 
 The binary tree tests the limits of the memory reclamation implementation, which scales with the leaky versions, but has a more gradual slope.  At 10\% it declines at the end, just as the hash table did, and for the same reason.  The binary tree, exceeding the performance of this hash table, involves more writing per update.  At 20\% updates, the leaky versions reach the memory bandwidth limits before they've run out of physical threads.
 
-In all three set structures, reclaiming memory scales up to the physical limits of the hardware, albeit with a gentler slope.
-
 \begin{figure*}[tbp]
   \centering
   \raisebox{-0.5\height}{\includegraphics[scale=0.25]{gfx/SprayList.pdf}}
@@ -54,5 +52,7 @@ In all three set structures, reclaiming memory scales up to the physical limits 
   \label{fig:priorityqueues}
 \end{figure*}
 
-Lastly, in figure \ref{fig:priorityqueues}, we tested the one priority queue.
+Lastly, in figure \ref{fig:priorityqueues}, we tested the SprayList priority queue.  The leaky implementations took a performance hit crossing the NUMA node boundary at 36 cores and never recovered.  One of the difficulties with a skip list-based priority queue is that many threads have a few early nodes in common in their caches.  As thread-counts increase, so do the number of invalidations, leading to the shape of the graph.  This is a worst-case data structure for Forkscan because priority queues are entirely updates, and the nodes are big (180 bytes, in this implementation).  However, again, the retiring DEF implementation has the same shape as the leaky ones.  It scales while they scale, and it's ultimately defeated by the same hurdle.
+
+In all of these structures, reclaiming memory scales up to the physical limits of the hardware, albeit with a gentler slope.  We attribute this to the on-demand aspect of memory tracking, versus at-allocation tracking; the memory that gets retired can mostly be deallocated.  Very little has to be recursively searched.
 
