@@ -2,7 +2,7 @@ C was designed to write the Unix operating system in a time of irregular archite
 
 Go is a modern programming language intended to be fast where C is fast in spite of a garbage collector.\cite{Go}  It has the look and feel of a higher level language without the cost of an interpreter.  It has lambdas, message passing, array slices, and a host of other features not commonly associated with systems languages.  However, even though it's able to eliminate array bounds checking in most cases, it still checks unless it can prove it doesn't have to.  Additionally, Go types always respect alignment, even within structures, so a programmer can reorder the members but there is no way to pack it down to the machine-addressable level.
 
-Rust, likewise, doesn't provide controls for laying out data.  Padding and alignment are unspecified and Rust even reserves the right to reorder members.  Both languages can generate fast code, but they aren't close to the machine because they forbid fine tuning.
+In Rust the story is a little better. By default padding and alignment are unspecified and Rust even reserves the right to reorder members. However Rust has compiler directives layout memory like that in C and to pack structures.
 
 C++, building on C, is designed neither to introduce safety-related overheads, nor to prohibit programmer fine-tuning to architectural peculiarities.  It doesn't, for example, insert instructions to protect programmers from invalid array indexes.  In fact, memory allocators implemented in C++ depend on the ability to do exactly that, often storing memory metadata in a structure before the memory handed out.\cite{Hoard, TCMalloc, Supermalloc}  As in C, memory is memory, and any type structure can be imposed upon it.
 
