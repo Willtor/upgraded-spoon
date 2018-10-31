@@ -1,4 +1,4 @@
-For a thorough examination of the language, DEF has a language wiki,\cite{DEFWiki} however, a brief comparison with C is provided to show that it is, in fact, close to the machine in the same way that C is, albeit with a different syntax.  The DEF compiler is based on the Tapir branch of LLVM, that adds fork-join parallelism primitives.\cite{TAPIR,LLVM}  At present, it only runs on Linux.  The front-end is principly written in OCaml, but includes some C++.
+For a thorough examination of the language, DEF has a language wiki,\cite{DEFWiki} however, a brief comparison with C is provided to show that it is, in fact, close to the machine in the same way that C is, albeit with a different syntax.  The DEF compiler is based on the Tapir branch of LLVM, that adds fork-join parallelism primitives.\cite{TAPIR,LLVM}  At present, it only runs on Linux.  The front-end is principally written in OCaml, but includes some C++.
 
 Likewise, the \texttt{defghi} utility is written in OCaml,\cite{DEF} and is described in the Compatibility section.
 
@@ -75,7 +75,7 @@ C++ is the gold-standard for interfacing with C.  As mentioned above, C header f
 
 Generating headers and interface files is assisted by DEF's explicit approach to module interfaces.  A subtle distinction from C is that DEF types, functions, and globally-scoped variables are local to the module in which they appear, by default.  C's default is external visibility, and local symbols must be marked \texttt{static} by the programmer.  In contrast, DEF's default visibility is local and requires programmers to mark symbols with \texttt{export} in order to make them available to other modules.
 
-Generating header files from \texttt{defghi} is simple since the differences in declarations are syntactic.  Any type, global variable, or function marked \texttt{export} has its declation unparsed into C and pretty-printed into the target header.
+Generating header files from \texttt{defghi} is simple since the differences in declarations are syntactic.  Any type, global variable, or function marked \texttt{export} has its declaration unparsed into C and pretty-printed into the target header.
 
 \begin{figure}[htbp!]
         \centering
