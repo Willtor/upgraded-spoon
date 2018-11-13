@@ -1,6 +1,6 @@
 \subsection{Test Configuration}
 
-Our benchmark was tested on a 72-core (4 sockets with 18 cores each capable of running 2 hardware threads, totalling 144 hardware threads) Intel Xeon machine clocked at 2.50 GHz with 512 GB of RAM and 4 memory banks. The machine is running Ubuntu 14.04 with kernel version 3.13.0-141. The with DEF code was compiled with DEF version 0.16.1a and the C code was compiled with Clang 6.0, and all code was compiled with -03 level of optimization.
+Our benchmark was tested on a 72-core (4 sockets with 18 cores each capable of running 2 hardware threads, totalling 144 hardware threads) Intel Xeon machine clocked at 2.50 GHz with 512 GB of RAM and 4 memory banks. The machine is running Ubuntu 14.04 with kernel version 3.13.0-141. The with DEF code was compiled with DEF version 0.18.0a and the C code was compiled with Clang 6.0, and all code was compiled with -03 level of optimization.
 
 During the benchmark threads were pinned programmatically to individual cores initially avoiding HyperThreading and later exhausting all individual execution units on a single CPU with the use of HyperThreading, before migrating to another CPU socket. JEMalloc\cite{JEMalloc} was used in all tests, as it had been in the Forkscan paper.\cite{Forkscan} The \texttt{numactl} Linux program was used to control which memory bank allocation was allowed to take place. The memory banks closest to the running CPUs were selected as they became active.
 
